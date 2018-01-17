@@ -1,0 +1,30 @@
+# useful aliases for bash
+# save as "~/.bash_aliases"
+
+# history search
+alias hs="history | grep -i"
+
+# fs
+alias dfh="df -khT"
+alias d1="du -h -d 1"
+alias ds="du -h -s"
+alias dss="du -h -S"
+alias mkdir="mkdir -pv"
+alias ..="cd ../"
+alias ...="cd ../.."
+
+# network
+alias rt="netstat -rn"
+alias rt4="netstat -rn4"
+alias rt6="netstat -rn6"
+alias sk="netstat -tulanp"
+alias sk4="netstat -tulanp4"
+alias sk6="netstat -tulanp6"
+alias wget='wget -c'
+
+# proc
+alias pss="ps aux | grep -i"
+alias psc='ps auxf | sort -nr -k 3 | head -10'
+alias psca='ps auxf | sort -nr -k 3'
+alias psm='ps auxf | sort -nr -k 4 | head -10'
+alias psma='ps auxf | sort -nr -k 4'
