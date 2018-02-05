@@ -17,8 +17,9 @@ JSONMAP = OrderedDict({
             'lineno': '',
             'pathname': '',
             'exception': OrderedDict({
-                'type': '',
-                'value': ''
+                'exctype': '',
+                'excvalue': '',
+                'exctrace': ''
             })
     })
 })
@@ -61,6 +62,8 @@ class JSONMapFormatter(Formatter):
         self.argskey = argskey
         self.null = null
         self.stripe = stripe
+        # dict for extra values
+        self._extra = OrderedDict()
 
     def _set_extra(self, data, keys, value):
         """ sets values to nested dict from keys path
@@ -130,6 +133,7 @@ class JSONMapFormatter(Formatter):
         emsglist = [record.args] if isinstance(record.args, Mapping) else [i for i in record.args if isinstance(i, Mapping)]
         # update record mehods dict with args dicts
         extramsg = record.__dict__.copy()
+        extramsg.update(self._extra)
         for i in emsglist:
             extramsg.update(i)
 
@@ -164,13 +168,25 @@ class JSONMapFormatter(Formatter):
         returns (str): log string created by Formatter class
         """
 
-        # adding time to record
-        record.time = super().formatTime(record)
+        # format time
+        self._extra['time'] = super().formatTime(record)
+
+        # format exception
+        if record.exc_info:
+            self._extra['exctype'] = record.exc_info[0].__name__
+            self._extra['excvalue'] = record.exc_info[1].args
+            self._extra['exctrace'] = record.exc_text if record.exc_text else super().formatException(record.exc_info)
 
         # only one passing is needed for first handler, other handlers can use earlier msg
         if not self.msg:
             # filling data from record
             self._set_msg(record)
+
+        # if exception, msg has to me changed because exceptions is not JSON serializable
+        if record.exc_info:
+            self.msg['msg'] = self._extra['exctype']
+            # prevents generate additional message from Formatter
+            record.exc_info = None
 
         # set record message
         record.msg = dumps(self.msg)
