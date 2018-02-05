@@ -33,16 +33,19 @@ class JSONMapFormatter(Formatter):
     That may be useful for some purposes e.g. for creating standard syslog entry with extra JSON message.
     """
 
-    def __init__(self, jsonmap=JSONMAP, extrakeys=['extra', 'data'], argskey=['args'], fmt='%(message)s', datefmt=None, style='%'):
+    def __init__(self, jsonmap=JSONMAP, extrakeys=['extra', 'data'],
+                argskey=['args'], fmt='%(message)s', datefmt=None, style='%'):
         """ init function
 
         parameters:
             kwargs:
                 jsonmap (Mapping): dict-like obj describes JSON message default: JSONMAP
                 extrakeys (list): sequence contains path to extra key,
-                    which serves for additional values created from dict-like message entries; default: ['extra', 'data']
+                    which serves for additional values created from dict-like message entries;
+                    default: ['extra', 'data']
                 argskey (list): sequence contains path to args key,
-                    which serves for additional values from nondict-like enties; default: ['args']; this value will be added to `extrakeys` path
+                    which serves for additional values from nondict-like enties; default: ['args'];
+                    this value will be added to `extrakeys` path
                 fmt (str): logging message format; default: '%(message)s'
                 datefmt (str): logging date format; default: None
                 style (str): logging type of format; default: '%'
@@ -65,7 +68,7 @@ class JSONMapFormatter(Formatter):
         """
 
         # set extra path
-        reduce(lambda x, key: x.setdefault(key, type(data)()), keys[:-1], data)  # type(a)() is more universal than just {}
+        reduce(lambda x, key: x.setdefault(key, type(data)()), keys[:-1], data)  # type(a)() is more universal than {}
         # set value
         reduce(lambda x, key: x.setdefault(key, value), keys, data)
 
