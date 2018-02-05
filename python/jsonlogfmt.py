@@ -100,6 +100,7 @@ class JSONMapFormatter(Formatter):
         """
 
         # getting data from args
+        # !!! be careful, values of dict-like obj if they have similar values on one level will be rewritten on value of latest obj (as  dict.update() does it)
         emsglist = [record.args] if isinstance(record.args, Mapping) else [i for i in record.args if isinstance(i, Mapping)]
         # update record mehods dict with args dicts
         extramsg = record.__dict__.copy()
