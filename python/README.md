@@ -110,7 +110,7 @@ _(output was formatted, original is ordinary flat string)_
 
 Be careful, entry values of dict-like obj if they have similar keys on one level **will be rewritten** on value of latest obj.
 
-### Custom extrakeys
+### Custom extrakeys and argskey
 By default for storing extra data _extra: {data: {}}_ path is used (_extra: {data: {args: {}}}_ for non dict-like args) that behavior can be changed. Use `extrakeys` for dict-like obj and `argskey` for non dict-like args). E.g. `fmt = JSONMapFormatter(jsonmap=newJSONMap, extrakeys=['newExtrapath', 'subpath'], argskey=['newArgspath'])` gives:
 
 _Output:_
