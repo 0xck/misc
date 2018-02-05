@@ -31,13 +31,34 @@ if __name__ == '__main__':
 _Output:_
 
 ```json
-{"time": "2018-02-05 21:06:25,618", "levelname": "INFO", "name": "root", "msg": "MESSAGE", "extra": {"funcName": "<module>", "lineno": 18, "pathname": "./test.py", "exception": {"type": "", "value": 1}, "data": {"1st": {"2nd": {"3rd": {"value": 3}}, "value": 2}, "4th": 4, "args": ["more value", "one more value"]}}}
+{'extra': {'data': {'1st': {'2nd': {'3rd': {'value': 3}}, 'value': 2},
+                    '4th': 4,
+                    'args': ['more value', 'one more value']},
+           'exception': {'type': '', 'value': 1},
+           'funcName': '<module>',
+           'lineno': 18,
+           'pathname': './test.py'},
+ 'levelname': 'INFO',
+ 'msg': 'MESSAGE',
+ 'name': 'root',
+ 'time': '2018-02-05 21:06:25,618'}
 
 ```
 
 Changing `JSONMapFormatter()` to `JSONMapFormatter(fmt='%(name)s / %(asctime)s / %(message)s')` gives:
 
 ```json
-root / 2018-02-05 21:08:20,876 / {"time": "2018-02-05 21:08:20,876", "levelname": "INFO", "name": "root", "msg": "MESSAGE", "extra": {"funcName": "<module>", "lineno": 18, "pathname": "./test.py", "exception": {"type": "", "value": 1}, "data": {"1st": {"2nd": {"3rd": {"value": 3}}, "value": 2}, "4th": 4, "args": ["more value", "one more value"]}}}
+root / 2018-02-05 21:08:20,876 / 
+{'extra': {'data': {'1st': {'2nd': {'3rd': {'value': 3}}, 'value': 2},
+                    '4th': 4,
+                    'args': ['more value', 'one more value']},
+           'exception': {'type': '', 'value': 1},
+           'funcName': '<module>',
+           'lineno': 18,
+           'pathname': './test.py'},
+ 'levelname': 'INFO',
+ 'msg': 'MESSAGE',
+ 'name': 'root',
+ 'time': '2018-02-05 21:08:20,876'}
 
 ```
