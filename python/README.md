@@ -30,6 +30,8 @@ if __name__ == '__main__':
 ```
 _Output:_
 
+_(output was formatted, original is ordinary flat string)_
+
 ```json
 {'extra': {'data': {'1st': {'2nd': {'3rd': {'value': 3}}, 'value': 2},
                     '4th': 4,
