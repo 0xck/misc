@@ -34,7 +34,8 @@ class JSONMapFormatter(Formatter):
     """
 
     def __init__(self, jsonmap=JSONMAP, extrakeys=['extra', 'data'],
-                argskey=['args'], fmt='%(message)s', datefmt=None, style='%'):
+                argskey=['args'], null='', stripe=False,
+                fmt='%(message)s', datefmt=None, style='%'):
         """ init function
 
         parameters:
@@ -46,6 +47,8 @@ class JSONMapFormatter(Formatter):
                 argskey (list): sequence contains path to args key,
                     which serves for additional values from nondict-like enties; default: ['args'];
                     this value will be added to `extrakeys` path
+                null (any): terminator shows empty values, useful in `jsonmap`; default: ''
+                stripe (bool): defines if empty `jsonmap` values will be added to message; default: False
                 fmt (str): logging message format; default: '%(message)s'
                 datefmt (str): logging date format; default: None
                 style (str): logging type of format; default: '%'
@@ -56,6 +59,8 @@ class JSONMapFormatter(Formatter):
         self.msg = OrderedDict()
         self.extrakeys = extrakeys
         self.argskey = argskey
+        self.null = null
+        self.stripe = stripe
 
     def _set_extra(self, data, keys, value):
         """ sets values to nested dict from keys path
@@ -82,22 +87,33 @@ class JSONMapFormatter(Formatter):
             kwargs:
                 msg (Mapping): dict-like obj for adding; default: None
         """
-
+        count = 0
         # defines msg from self, that means 1st enter to recursively bypassing
         msg = self.msg if msg is None else msg
 
         # recursively bypassing each jsonmap entry
         for i in jsonmap:
+
             # if value is dict-like obj than recursively bypassing one
             if isinstance(jsonmap[i], Mapping):
                 # creates a new dict value which will be used for filling
                 msg[i] = OrderedDict()
-                self._msg_filler(jsonmap[i], data, msg=msg[i])
+                cnt = self._msg_filler(jsonmap[i], data, msg=msg[i])
+                #  in case stripe is enabled removes latest key in case no one value was added
+                if self.stripe and cnt == 0:
+                    del msg[i]
+
             # adding value in case one does not exist
             else:
-                item = data.pop(i, '')
+                item = data.pop(i, self.null)
+                # does not add empty value in case stripe is enabled
+                if self.stripe and item is self.null:
+                    continue
                 if msg.get(i, None) is None:
                     msg[i] = item
+                    count += 1
+
+        return count
 
     def _set_msg(self, record):
         """ set msg data from given log messages and args
@@ -138,9 +154,9 @@ class JSONMapFormatter(Formatter):
     def format(self, record):
         """ rewriting Formatter().format method
 
-        Making new JSON message from given logger obj,
-        changing record.msg attribute to new message,
-        returning Formatter().format method.
+        Makes new JSON message from given logger obj,
+        changes record.msg attribute to new message,
+        returns Formatter().format method.
 
         parameters:
             args:
