@@ -27,7 +27,10 @@ JSONMAP = OrderedDict({
 class JSONMapFormatter(Formatter):
     """ JSONMapFormatter allows format standard logging messasges to JSON
 
-    One uses dict-like map which describes keys are included in new formatted message. Moreover standard logging fuction partially saved, default formatting style is still supported e.g. define format as '%(asctime)s %(name)s' and logger returns those values in log message. That may be useful for some purposes e.g. for creating standard syslog entry with extra JSON message.
+    One uses dict-like map which describes keys are included in new formatted message.
+    Moreover standard logging fuction partially saved, default formatting style is still supported,
+    e.g. define format as '%(asctime)s %(name)s' and logger returns those values in log message.
+    That may be useful for some purposes e.g. for creating standard syslog entry with extra JSON message.
     """
 
     def __init__(self, jsonmap=JSONMAP, extrakeys=['extra', 'data'], argskey=['args'], fmt='%(message)s', datefmt=None, style='%'):
@@ -36,8 +39,10 @@ class JSONMapFormatter(Formatter):
         parameters:
             kwargs:
                 jsonmap (Mapping): dict-like obj describes JSON message default: JSONMAP
-                extrakeys (list): sequence contains path to extra key which serves for additional values created from dict-like message entries; default: ['extra', 'data']
-                argskey (list): sequence contains path to args key which serves for additional values from nondict-like enties; default: ['args']; this value will be added to `extrakeys` path
+                extrakeys (list): sequence contains path to extra key,
+                    which serves for additional values created from dict-like message entries; default: ['extra', 'data']
+                argskey (list): sequence contains path to args key,
+                    which serves for additional values from nondict-like enties; default: ['args']; this value will be added to `extrakeys` path
                 fmt (str): logging message format; default: '%(message)s'
                 datefmt (str): logging date format; default: None
                 style (str): logging type of format; default: '%'
@@ -100,7 +105,9 @@ class JSONMapFormatter(Formatter):
         """
 
         # getting data from args
-        # !!! be careful, values of dict-like obj if they have similar values on one level will be rewritten on value of latest obj (as  dict.update() does it)
+        # !!! be careful
+        # values of dict-like obj if they have similar values on one level will be rewritten on value of latest obj
+        # as  dict.update() does it
         emsglist = [record.args] if isinstance(record.args, Mapping) else [i for i in record.args if isinstance(i, Mapping)]
         # update record mehods dict with args dicts
         extramsg = record.__dict__.copy()
@@ -128,7 +135,9 @@ class JSONMapFormatter(Formatter):
     def format(self, record):
         """ rewriting Formatter().format method
 
-        Making new JSON message from given logger obj, changing record.msg attribute to new message, returning Formatter().format method
+        Making new JSON message from given logger obj,
+        changing record.msg attribute to new message,
+        returning Formatter().format method.
 
         parameters:
             args:
