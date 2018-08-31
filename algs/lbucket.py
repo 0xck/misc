@@ -64,7 +64,7 @@ def cast_time(time_value, offset):
         offset (int): Offset serves to purpose of changing time interval rate.
 
     Returns:
-        int: Time value represented as number of us
+        int: Time value represented as number of ms, us, etc
 
     For representing different time ranges use `offset` value as:
         for ms use `offset` equals 1000
@@ -268,7 +268,7 @@ def per_item_lbucket(in_queue, out_queue, max_xmit, burst,
         send_req (function): Function for sending request. Default is `send_req_deque()`
 
     Returns:
-        dict-like obj or None. `dict-like obj` is returned if no shared data is used,
+        dict-like obj or None: `dict-like obj` is returned if no shared data is used,
         provided info might be useful for certain cases, otherwise `None`.
 
     A function handles requests from given `in_queue` checks if there is possibility to transmit request
