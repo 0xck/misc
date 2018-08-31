@@ -205,15 +205,16 @@ class ReqInfo(object):
 
 
 def req_info_extract(data, req):
-    """Request info represented as namedtuple.
+    """Getting request info representation.
 
     Args:
-        data (dict-like obj): Data for requests, contains: maximum and free number of attemps, timestamp
+        data (dict-like obj): Data for requests, contains: maximum of attemps per sec, timestamp, lock
         req (req): Request obj
 
     Returns:
-        ReqInfo or None: if request item is present in data then ReqInfo obj contains:
-            maximum and free number of attemps, timestamp, lock, otherwise None
+        ReqInfo or None: if request item is present in data,
+            then ReqInfo obj contains: maximum of attemps per sec, timestamp, lock,
+            otherwise None
     """
 
     # assuming req has `id` attribute
