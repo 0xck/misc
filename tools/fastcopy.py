@@ -6,7 +6,7 @@ import stat
 
 
 def path_validation(path, length):
-    """Validation and normalization given path
+    """Validation and normalization of given path
 
     Args:
         path (str): Path to file
@@ -18,6 +18,7 @@ def path_validation(path, length):
     Raises:
         ValueError
     """
+    # For windows long name prefix `\\?\` will be added
 
     # normilizers for given path
     normilizers = [
@@ -31,9 +32,12 @@ def path_validation(path, length):
         raise ValueError("Empty path")
 
     # support of long name in windows
-    # convert to unicode and strip long name prefix
+    # convert to unicode and cutting long name prefix if one exists
+    # for normilizing processes
     if sys.platform.startswith('win'):
         path = unicode(path).lstrip("\\\\?\\")
+        # long name prefix offset
+        length -= 4
 
     # getting normilized path
     path = reduce(lambda a, f: f(a), normilizers, path)
