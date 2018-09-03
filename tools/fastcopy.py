@@ -19,16 +19,21 @@ def path_validation(path, length):
         ValueError
     """
 
-    # empty path is not allowed
-    if not path:
-        raise ValueError("Empty path")
-
     # normilizers for given path
     normilizers = [
         os.path.expandvars,
         os.path.expanduser,
         os.path.normpath,
         os.path.normcase]
+
+    # empty path is not allowed
+    if not path:
+        raise ValueError("Empty path")
+
+    # support of long name in windows
+    # convert to unicode and strip long name prefix
+    if sys.platform.startswith('win'):
+        path = unicode(path).lstrip("\\\\?\\")
 
     # getting normilized path
     path = reduce(lambda a, f: f(a), normilizers, path)
@@ -40,6 +45,11 @@ def path_validation(path, length):
     # path is not regular file
     if os.path.exists(path) and not stat.S_ISREG(os.stat(path).st_mode):
         raise ValueError("Path <{}> is not a regular file".format(path))
+
+    # support of long name in windows
+    # adding long name `\\?\` prefix
+    if sys.platform.startswith('win'):
+        path = u'\\\\?\\' + path
 
     return path
 
