@@ -9,8 +9,8 @@ def path_validation(path, length):
     """Validation and normalization of given path
 
     Args:
-        path (str): Path to file
-        length (int): Max possible path length
+        path (unicode): Path to file
+        length (unicode): Max possible path length
 
     Returns:
         str: normalized path
@@ -32,28 +32,21 @@ def path_validation(path, length):
         raise ValueError("Empty path")
 
     # support of long name in windows
-    # convert to unicode and cutting long name prefix if one exists
-    # for normilizing processes
-    if sys.platform.startswith('win'):
-        path = unicode(path).lstrip("\\\\?\\")
-        # long name prefix offset
-        length -= 4
+    # adding long name `\\?\` prefix
+    if sys.platform.startswith('win') and not path.startswith(u"\\\\?\\"):
+        path = u"\\\\?\\" + path
 
     # getting normilized path
     path = reduce(lambda a, f: f(a), normilizers, path)
 
     # path is too long
     if len(path) > length:
-        raise ValueError("Path <{}> is too long <{}>. Max path length is <{}>".format(path, len(path), length))
+        raise ValueError(
+            "Path <{}> is too long <{}>. Max path length is <{}>".format(path, len(path), length))
 
     # path is not regular file
     if os.path.exists(path) and not stat.S_ISREG(os.stat(path).st_mode):
         raise ValueError("Path <{}> is not a regular file".format(path))
-
-    # support of long name in windows
-    # adding long name `\\?\` prefix
-    if sys.platform.startswith('win'):
-        path = u'\\\\?\\' + path
 
     return path
 
@@ -96,7 +89,7 @@ def mmcopy(src_path, dst_path, buffer, rm_on_err=True):
     mmsrc, err = None, None
 
     try:
-        with open(src_path, "rb", 0) as src, open(dst_path, "w+b", 0) as dst:
+        with open(src_path, mode="rb", buffering=0) as src, open(dst_path, mode="w+b", buffering=0) as dst:
 
             mmsrc = get_mmsrc(src)
 
@@ -135,10 +128,15 @@ def user_input():
     """Simple user input function. One asks for source and destination paths.
 
     Returns:
-        tuple: Source and destination paths
+        tuple(unicode, unicode): Source and destination paths
     """
+    try:
+        return (raw_input("Enter source file path: ").decode(sys.stdin.encoding),
+                raw_input("Enter destination file path: ").decode(sys.stdin.encoding))
 
-    return raw_input("Enter source file path: "), raw_input("Enter destination file path: ")
+    # in case of interruption
+    except EOFError:
+        return u'', u''
 
 
 def copy(src_path, dst_path, src_len=1024, dst_len=3096,
@@ -148,8 +146,8 @@ def copy(src_path, dst_path, src_len=1024, dst_len=3096,
     """Copy file, using especial engine defined in args, default is copy by using mmap.
 
     Args:
-        src_path (str): Source path to file
-        dst_path (str): Destination Path to file
+        src_path (unicode): Source path to file
+        dst_path (unicode): Destination Path to file
         src_len (int): Max possible source path length
         dst_len (int): Max possible destination path length
         save_perm (bool): Copy file permissions from source to destination
@@ -193,7 +191,8 @@ def copy(src_path, dst_path, src_len=1024, dst_len=3096,
 
         raise ValueError(msg)
 
-    if os.path.exists(dst) and os.path.samefile(src, dst):
+    # checking if same file
+    if os.path.exists(dst) and getattr(os.path, "samefile", lambda a, b: a == b)(src, dst):
         msg = "Source file <{}> is the same as destination file <{}>".format(src, dst)
         logging.error(msg)
 
