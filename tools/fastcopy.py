@@ -5,6 +5,19 @@ import mmap
 import stat
 
 
+def exc_msg(msg, encoding=sys.stdout.encoding):
+    """Encode messages for exeptions
+
+    Args:
+        msg (unicode): Message
+        encoding (str): Encoding
+
+    Returns:
+        str: Encoded message
+    """
+    return msg.encode(encoding)
+
+
 def path_validation(path, length):
     """Validation and normalization of given path
 
@@ -29,7 +42,7 @@ def path_validation(path, length):
 
     # empty path is not allowed
     if not path:
-        raise ValueError("Empty path")
+        raise ValueError(u"Empty path")
 
     # support of long name in windows
     # adding long name `\\?\` prefix
@@ -42,11 +55,11 @@ def path_validation(path, length):
     # path is too long
     if len(path) > length:
         raise ValueError(
-            "Path <{}> is too long <{}>. Max path length is <{}>".format(path, len(path), length))
+            exc_msg(u"Path <{}> is too long <{}>. Max path length is <{}>".format(path, len(path), length)))
 
     # path is not regular file
     if os.path.exists(path) and not stat.S_ISREG(os.stat(path).st_mode):
-        raise ValueError("Path <{}> is not a regular file".format(path))
+        raise ValueError(exc_msg(u"Path <{}> is not a regular file".format(path)))
 
     return path
 
@@ -103,11 +116,11 @@ def mmcopy(src_path, dst_path, buffer, rm_on_err=True):
                 chunk = mmsrc.read(buffer)
 
     except KeyboardInterrupt as err:
-        logging.info("Ctrl+C interruption")
+        logging.info(u"Ctrl+C interruption")
 
     # there are many type of errors can happened and mmap objs have to be closed in all cases
     except Exception as err:
-        logging.error("An error occured during copy file")
+        logging.error(u"An error occured during copy file")
         logging.exception(err)
 
     finally:
@@ -115,7 +128,7 @@ def mmcopy(src_path, dst_path, buffer, rm_on_err=True):
 
         # deleting dst
         if err is not None and os.path.exists(dst_path):
-            logging.info("Removing destination <{}>".format(dst_path))
+            logging.info(u"Removing destination <{}>".format(dst_path))
 
             os.remove(dst_path)
 
@@ -169,10 +182,10 @@ def copy(src_path, dst_path, src_len=1024, dst_len=3096,
     # buffer has to be related power 2
     # buffer has to be more or equal system mem pagesize
     if not (buffer and not (buffer & (buffer - 1))) or buffer < mmap.PAGESIZE:
-        msg = "Wrong buffer size. One has to be aligned by power of 2 and more or equal <{}>".format(mmap.PAGESIZE)
+        msg = u"Wrong buffer size. One has to be aligned by power of 2 and more or equal <{}>".format(mmap.PAGESIZE)
         logging.error(msg)
 
-        raise ValueError(msg)
+        raise ValueError(exc_msg(msg))
 
     # validating paths
     try:
@@ -180,33 +193,33 @@ def copy(src_path, dst_path, src_len=1024, dst_len=3096,
         dst = validate(dst_path, dst_len)
 
     except ValueError as err:
-        logging.error("Paths validation faled")
+        logging.error(u"Paths validation faled")
         logging.exception(err)
 
         raise
 
     if not os.path.exists(src):
-        msg = "Source file <{}> does not exist".format(src)
+        msg = u"Source file <{}> does not exist".format(src)
         logging.error(msg)
 
-        raise ValueError(msg)
+        raise ValueError(exc_msg(msg))
 
     # checking if same file
     if os.path.exists(dst) and getattr(os.path, "samefile", lambda a, b: a == b)(src, dst):
-        msg = "Source file <{}> is the same as destination file <{}>".format(src, dst)
+        msg = u"Source file <{}> is the same as destination file <{}>".format(src, dst)
         logging.error(msg)
 
-        raise ValueError(msg)
+        raise ValueError(exc_msg(msg))
 
-    logging.info("Starting copy <{}> to <{}>".format(src, dst))
+    logging.info(u"Starting copy <{}> to <{}>".format(src, dst))
 
     # copy file
     copy_engine(src, dst, buffer, rm_on_err)
 
-    logging.info("Copy done")
+    logging.info(u"Copy done")
 
     # setting destination file permissions
     if save_perm:
         os.chmod(dst, stat.S_IMODE(os.stat(src).st_mode))
 
-        logging.info("Permission on destination file changed")
+        logging.info(u"Permission on destination file changed")
