@@ -89,7 +89,7 @@ def mmcopy(src_path, dst_path, buffer, rm_on_err=True):
     mmsrc, err = None, None
 
     try:
-        with open(src_path, mode="rb", buffering=0) as src, open(dst_path, mode="w+b", buffering=0) as dst:
+        with open(src_path, "rb", 0) as src, open(dst_path, "w+b", 0) as dst:
 
             mmsrc = get_mmsrc(src)
 
