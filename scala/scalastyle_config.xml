@@ -1,0 +1,22 @@
+<scalastyle commentFilter="disabled">
+    <name>scalastyle Complexity Configuration</name>
+    <check level="warning" class="org.scalastyle.scalariform.CyclomaticComplexityChecker" enabled="true">
+        <parameters>
+            <parameter name="maximum">10</parameter>
+            <parameter name="countCases">true</parameter>
+        </parameters>
+    </check>
+    <check enabled="true" class="org.scalastyle.scalariform.DeprecatedJavaChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.RedundantIfChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.ReturnChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.EmptyClassChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.ForBraceChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.LowercasePatternMatchChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.NullChecker" level="warning">
+        <parameters>
+            <parameter name="allowNullChecks">true</parameter>
+        </parameters>
+    </check>
+    <check enabled="true" class="org.scalastyle.scalariform.OverrideJavaChecker" level="warning"/>
+    <check enabled="true" class="org.scalastyle.scalariform.UppercaseLChecker" level="warning"/>
+</scalastyle>
