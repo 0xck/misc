@@ -14,7 +14,6 @@ import (
 type Conf struct {
 	str      string
 	filePath string
-	// logFile  string
 }
 
 var cfg Conf
@@ -92,7 +91,7 @@ func getNetsFromInput(str string, path string) ([]string, error) {
 	return list, err
 }
 
-func getNetsFromStr(str []string) ([]iplib.Net, error) {
+func getNetsFromString(str []string) ([]iplib.Net, error) {
 	var list []iplib.Net
 	var err error = nil
 
@@ -104,23 +103,23 @@ func getNetsFromStr(str []string) ([]iplib.Net, error) {
 		}
 		list = append(list, n)
 	}
-	// it is very important to keep network sorted, then absorbing works properly
+	// it is very important to keep network list sorted, then absorbing works properly
 	sort.Sort(iplib.ByNet(list))
 	return list, err
 }
 
 // absorbing small net by more large net
 // if possible supernet is not real super net for given net, then
-// adding the latter to aggregated and make it a new supernet for furter nets checking
+// adding the latter to absorbed and make it a new supernet for further nets checking
 // otherwise do nothing, just skip the net due to one is absorbed by supernet
 // 192.168.0.0/22, 192.168.0.0/24, 192.168.2.0/24 -> 192.168.0.0/22
-// Note. aggregated must be sorted, otherwise it can not work properly
-func largeNetsAbsorbSmall(aggregated []iplib.Net, superNet iplib.Net, net iplib.Net) ([]iplib.Net, iplib.Net) {
+// Note. Absorbed must be sorted, otherwise it can not work properly
+func largeNetsAbsorbSmall(absorbed []iplib.Net, superNet iplib.Net, net iplib.Net) ([]iplib.Net, iplib.Net) {
 	if !superNet.ContainsNet(net) {
-		aggregated = append(aggregated, net)
+		absorbed = append(absorbed, net)
 		superNet = net
 	}
-	return aggregated, superNet
+	return absorbed, superNet
 }
 
 func lastIsNotGiven(sources []iplib.Net, nets ...iplib.Net) bool {
@@ -129,7 +128,6 @@ func lastIsNotGiven(sources []iplib.Net, nets ...iplib.Net) bool {
 	for _, i := range nets {
 		result = result && iplib.CompareNets(last, i) != 0
 	}
-	// return iplib.CompareNets(last, a) != 0 && iplib.CompareNets(last, b) != 0
 	return result
 }
 
@@ -157,7 +155,6 @@ func smallMergedToLarge(aggregated []iplib.Net, net1 iplib.Net, net2 iplib.Net) 
 		aggregated = append(aggregated, net1)
 		// if last aggregated is not net1 or its maximum closest supernet, then adding one
 	} else if lastIsNotGiven(aggregated, net1, net1SuperNet) {
-		// } else if last := aggregated[len(aggregated)-1]; iplib.CompareNets(last, net1) != 0 && iplib.CompareNets(last, net1SuperNet) != 0 {
 		aggregated = append(aggregated, net1)
 	}
 	aggregated = append(aggregated, net2)
@@ -246,7 +243,7 @@ func main() {
 		return
 	}
 
-	nets, err := getNetsFromStr(stringNets)
+	nets, err := getNetsFromString(stringNets)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		exitCode = 1
