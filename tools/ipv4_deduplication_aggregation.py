@@ -113,6 +113,8 @@ def aggregate_networks(nets: List[IPv4Network]) -> List[IPv4Network]:
         net1_supernet = net1.supernet()
 
         if net1.prefixlen == net2.prefixlen and net1_supernet == net2.supernet():
+            if aggregated and aggregated[-1] == net1:
+                aggregated = aggregated[:-1]
             aggregated.append(net1_supernet)
         else:
             if not aggregated:
@@ -123,23 +125,22 @@ def aggregate_networks(nets: List[IPv4Network]) -> List[IPv4Network]:
 
         return aggregated, net2
 
-    if len(nets) == 1:
+    if len(nets) < 2:
         return nets
 
     source_nets: List[IPv4Network] = nets
     nets_number: int = len(nets)
 
-    while True:
-        source_nets, _ = reduce(large_absorb_small, source_nets[1:], ([source_nets[0]], source_nets[0]))
-        if len(source_nets) == 1:
-            break
+    source_nets, _ = reduce(large_absorb_small, source_nets[1:], ([source_nets[0]], source_nets[0]))
+    if len(source_nets) == 1:
+        return source_nets
 
+    while True:
         merge_list: List[IPv4Network] = []
         source_nets, _ = reduce(small_merge_large, source_nets[1:], (merge_list, source_nets[0]))
         if len(source_nets) == nets_number or len(source_nets) == 1:
             break
 
-        source_nets = sorted(source_nets)
         nets_number = len(source_nets)
 
     return source_nets
